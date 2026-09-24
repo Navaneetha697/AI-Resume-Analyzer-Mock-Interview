@@ -1,0 +1,2726 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Analyzer & Mock Interview</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        header {
+            background: #174ea6;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+            font-size: 32px;
+        }
+
+        header p {
+            font-size: 17px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 35px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+        }
+
+        h2 {
+            color: #174ea6;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            color: #174ea6;
+            margin: 20px 0 10px;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 18px 0 8px;
+        }
+
+        input[type=file],
+        input[type=text],
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 16px;
+            background: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
+            background: #174ea6;
+            color: white;
+            border: 0;
+            border-radius: 7px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0d3d85;
+        }
+
+        .interview-button {
+            background: #198754;
+        }
+
+        .interview-button:hover {
+            background: #146c43;
+        }
+
+        .stop-button {
+            background: #d93025;
+        }
+
+        .stop-button:hover {
+            background: #b42318;
+        }
+
+        .camera-button {
+            background: #198754;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #174ea6;
+            font-weight: bold;
+        }
+
+        .error {
+            display: none;
+            color: #b42318;
+            background: #fdecea;
+            padding: 14px;
+            margin-top: 15px;
+            border-radius: 7px;
+        }
+
+        .success {
+            color: #137333;
+            background: #e6f4ea;
+            padding: 14px;
+            margin-top: 15px;
+            border-radius: 7px;
+        }
+
+        .result {
+            display: none;
+            margin-top: 25px;
+            padding: 25px;
+            background: #f8faff;
+            border-radius: 10px;
+            border: 1px solid #dce6f7;
+        }
+
+        .score {
+            font-size: 45px;
+            font-weight: bold;
+            color: #174ea6;
+            margin: 15px 0;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .skill,
+        .missing-skill,
+        .suggested-skill {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .skill {
+            background: #dff5e8;
+            color: #137333;
+        }
+
+        .missing-skill {
+            background: #fde7e7;
+            color: #c5221f;
+        }
+
+        .suggested-skill {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .match-box {
+            background: #eef4ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+
+        .match-score {
+            font-size: 38px;
+            font-weight: bold;
+            color: #174ea6;
+            margin: 10px 0;
+        }
+
+        ul {
+            padding-left: 25px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+        /* =========================
+           CAMERA
+        ========================= */
+
+        #cameraVideo {
+            width: 100%;
+            max-width: 800px;
+            height: 430px;
+            object-fit: cover;
+            background: #111;
+            border-radius: 10px;
+            border: 3px solid #174ea6;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .camera-status {
+            text-align: center;
+            padding: 12px;
+            background: #eef4ff;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           AI INTERVIEW
+        ========================= */
+
+        #aiInterview {
+            display: none;
+        }
+
+        #aiStatus {
+            background: #eef4ff;
+            border-left: 5px solid #174ea6;
+            padding: 15px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        #transcript {
+            background: #fff8e1;
+            border-left: 5px solid #f9ab00;
+            padding: 15px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+            min-height: 55px;
+        }
+
+        #conversation {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .message {
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 9px;
+            line-height: 1.6;
+        }
+
+        .ai-message {
+            background: #eef4ff;
+            border-left: 5px solid #174ea6;
+        }
+
+        .user-message {
+            background: #e9f7ef;
+            border-left: 5px solid #198754;
+        }
+
+        .message-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .interview-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .interview-controls button {
+            flex: 1;
+        }
+
+        .listening {
+            background: #e6f4ea !important;
+            border-left-color: #198754 !important;
+        }
+
+        .speaking {
+            background: #eef4ff !important;
+            border-left-color: #174ea6 !important;
+        }
+
+        .processing {
+            background: #fff8e1 !important;
+            border-left-color: #f9ab00 !important;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+        }
+
+
+        @media(max-width:600px) {
+
+            header h1 {
+                font-size: 25px;
+            }
+
+            .container {
+                width: 94%;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            #cameraVideo {
+                height: 300px;
+            }
+
+            .interview-controls {
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<header>
+
+    <h1>
+        🤖 AI Resume Analyzer & Mock Interview
+    </h1>
+
+    <p>
+        Analyze your resume and practice interviews with AI
+    </p>
+
+</header>
+
+
+<div class="container">
+    <!-- ==================================================
+         RESUME ANALYZER
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            📄 Resume Analyzer
+        </h2>
+
+        <p>
+            Upload your resume in PDF format and get an instant analysis.
+        </p>
+
+
+        <label for="resumeFile">
+            Upload Resume PDF
+        </label>
+
+        <input
+            type="file"
+            id="resumeFile"
+            accept=".pdf">
+
+
+        <label for="jobRole">
+            Target Job Role
+        </label>
+
+        <input
+            type="text"
+            id="jobRole"
+            autocomplete="off"
+            placeholder="Example: Web Developer">
+
+
+        <button
+            type="button"
+            onclick="analyzeResume()">
+
+            📊 Analyze Resume
+
+        </button>
+
+
+        <div
+            id="resumeLoading"
+            class="loading">
+
+            ⏳ Analyzing your resume...
+
+        </div>
+
+
+        <div
+            id="resumeError"
+            class="error">
+        </div>
+
+
+        <!-- Resume Result -->
+
+        <div
+            id="resumeResult"
+            class="result">
+
+
+            <h2>
+                📊 Resume Analysis Result
+            </h2>
+
+
+            <h3>
+                Resume Score
+            </h3>
+
+            <div
+                id="score"
+                class="score">
+
+                --
+
+            </div>
+
+
+            <h3>
+                Skills Found
+            </h3>
+
+            <div
+                id="skillsFound"
+                class="skills">
+            </div>
+
+
+            <h3>
+                Missing Skills
+            </h3>
+
+            <div
+                id="missingSkills"
+                class="skills">
+            </div>
+
+
+            <h3>
+                Strengths
+            </h3>
+
+            <ul id="strengths">
+            </ul>
+
+
+            <h3>
+                Suggestions
+            </h3>
+
+            <ul id="suggestions">
+            </ul>
+
+
+            <!-- Job Match -->
+
+            <div
+                id="jobMatch"
+                class="match-box">
+
+
+                <h2>
+                    🎯 Job Role Match
+                </h2>
+
+
+                <p id="jobRoleName">
+                    Target Role: --
+                </p>
+
+
+                <div
+                    id="matchScore"
+                    class="match-score">
+
+                    --
+
+                </div>
+
+
+                <p>
+                    Skill match percentage
+                </p>
+
+
+                <h3>
+                    Matching Skills
+                </h3>
+
+                <div
+                    id="matchingSkills"
+                    class="skills">
+                </div>
+
+
+                <h3>
+                    Skills to Learn
+                </h3>
+
+                <div
+                    id="skillsToLearn"
+                    class="skills">
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         MOCK INTERVIEW SETTINGS
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            🎤 Start AI Mock Interview
+        </h2>
+
+
+        <label for="role">
+            Job Role
+        </label>
+
+        <input
+            type="text"
+            id="role"
+            autocomplete="off"
+            placeholder="Example: Web Developer">
+
+
+        <label for="experience">
+            Experience
+        </label>
+
+        <select
+            id="experience"
+            autocomplete="off">
+
+            <option value="">
+                Select Experience
+            </option>
+
+            <option value="Fresher">
+                Fresher
+            </option>
+
+            <option value="0-1 years">
+                0-1 years
+            </option>
+
+            <option value="1-3 years">
+                1-3 years
+            </option>
+
+            <option value="3+ years">
+                3+ years
+            </option>
+
+        </select>
+
+
+        <button
+            type="button"
+            class="interview-button"
+            onclick="startInterview()">
+
+            🎤 Start AI Mock Interview
+
+        </button>
+
+
+        <div
+            id="interviewLoading"
+            class="loading">
+
+            ⏳ Preparing your AI interview...
+
+        </div>
+
+
+        <div
+            id="interviewError"
+            class="error">
+        </div>
+
+    </div>
+    <!-- ==================================================
+         CAMERA SECTION
+    =================================================== -->
+
+    <div class="card">
+
+        <h2>
+            📹 Interview Camera
+        </h2>
+
+
+        <video
+            id="cameraVideo"
+            autoplay
+            muted
+            playsinline>
+        </video>
+
+
+        <div
+            id="cameraStatus"
+            class="camera-status">
+
+            📷 Camera is not started.
+
+        </div>
+
+
+        <button
+            type="button"
+            class="camera-button"
+            onclick="startCamera()">
+
+            📹 Start Camera
+
+        </button>
+
+
+        <button
+            type="button"
+            class="stop-button"
+            onclick="stopCamera()">
+
+            🛑 Stop Camera
+
+        </button>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         AI INTERVIEW SECTION
+    =================================================== -->
+
+    <div
+        id="aiInterview"
+        class="card">
+
+
+        <h2>
+            🤖 AI Interviewer
+        </h2>
+
+
+        <div
+            id="aiStatus">
+
+            🤖 AI is ready.
+
+        </div>
+
+
+        <div
+            id="transcript">
+
+            🎤 Your complete answer will appear here...
+
+        </div>
+
+
+        <div
+            id="conversation">
+        </div>
+
+
+        <div class="interview-controls">
+
+
+            <!-- Backup button.
+                 Normally AI will start listening
+                 automatically. -->
+
+            <button
+                type="button"
+                id="listenButton"
+                class="interview-button"
+                onclick="startListening()">
+
+                🎤 Start Listening
+
+            </button>
+
+
+            <button
+                type="button"
+                class="stop-button"
+                onclick="stopInterview()">
+
+                ⏹ Stop Interview
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- ==================================================
+     FOOTER
+=================================================== -->
+
+<footer>
+
+    <p>
+        AI Resume Analyzer & Mock Interview
+    </p>
+
+    <p>
+        Built with FastAPI + HTML + CSS + JavaScript
+    </p>
+
+</footer>
+
+
+<!-- ==================================================
+     JAVASCRIPT START
+=================================================== -->
+
+<script>
+
+const API_BASE =
+    "http://127.0.0.1:8000";
+
+
+/* ==================================================
+   GLOBAL VARIABLES
+================================================== */
+
+let recognition = null;
+
+let cameraStream = null;
+
+let interviewRunning = false;
+
+let isListening = false;
+
+let processingAnswer = false;
+
+let answerBuffer = "";
+
+let silenceTimer = null;
+
+let interviewQuestions = [];
+
+let currentQuestionIndex = 0;
+
+let currentQuestion = "";
+
+let jobRole = "";
+
+let experience = "";
+
+
+/* ==================================================
+   RESUME ANALYZER
+================================================== */
+
+async function analyzeResume() {
+
+    const fileInput =
+        document.getElementById("resumeFile");
+
+    const jobRoleInput =
+        document.getElementById("jobRole");
+
+    const loading =
+        document.getElementById("resumeLoading");
+
+    const error =
+        document.getElementById("resumeError");
+
+    const result =
+        document.getElementById("resumeResult");
+
+
+    error.style.display = "none";
+
+    result.style.display = "none";
+
+
+    if (
+        !fileInput.files ||
+        fileInput.files.length === 0
+    ) {
+
+        error.innerText =
+            "Please select your resume PDF first.";
+
+        error.style.display =
+            "block";
+
+        return;
+    }
+
+
+    const file =
+        fileInput.files[0];
+
+
+    if (
+        !file.name
+            .toLowerCase()
+            .endsWith(".pdf")
+    ) {
+
+        error.innerText =
+            "Please upload a PDF file.";
+
+        error.style.display =
+            "block";
+
+        return;
+    }
+
+
+    loading.style.display =
+        "block";
+
+
+    try {
+
+        const formData =
+            new FormData();
+
+
+        /*
+         * IMPORTANT:
+         * Your original backend uses the
+         * field name "file".
+         */
+
+        formData.append(
+            "file",
+            file
+        );
+
+
+        const response =
+            await fetch(
+                API_BASE +
+                "/resume/upload",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        if (!response.ok) {
+
+            console.error(
+                await response.text()
+            );
+
+            throw new Error(
+                "Resume upload failed."
+            );
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Resume response:",
+            data
+        );
+
+
+        document.getElementById(
+            "score"
+        ).innerText =
+            (
+                data.score ??
+                data.resume_score ??
+                0
+            ) + "/100";
+
+
+        const skillsFound =
+            data.skills_found ??
+            data.skills ??
+            [];
+
+
+        displaySkills(
+            "skillsFound",
+            skillsFound,
+            "skill"
+        );
+
+
+        displaySkills(
+            "missingSkills",
+            data.missing_skills ?? [],
+            "missing-skill"
+        );
+
+
+        displayList(
+            "strengths",
+            data.strengths ?? []
+        );
+
+
+        displayList(
+            "suggestions",
+            data.suggestions ?? []
+        );
+
+
+        calculateJobMatch(
+            jobRoleInput.value.trim(),
+            skillsFound
+        );
+
+
+        result.style.display =
+            "block";
+
+
+    } catch (err) {
+
+        console.error(
+            err
+        );
+
+
+        error.innerText =
+            "Unable to connect to the backend. " +
+            "Make sure FastAPI is running on port 8000.";
+
+
+        error.style.display =
+            "block";
+
+
+    } finally {
+
+        loading.style.display =
+            "none";
+
+    }
+
+}
+
+
+/* ==================================================
+   DISPLAY SKILLS
+================================================== */
+
+function displaySkills(
+    elementId,
+    skills,
+    className
+) {
+
+    const container =
+        document.getElementById(
+            elementId
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    if (
+        !Array.isArray(skills) ||
+        skills.length === 0
+    ) {
+
+        const span =
+            document.createElement(
+                "span"
+            );
+
+        span.innerText =
+            "None";
+
+        container.appendChild(
+            span
+        );
+
+        return;
+    }
+
+
+    skills.forEach(
+        function(skill) {
+
+            const span =
+                document.createElement(
+                    "span"
+                );
+
+            span.className =
+                className;
+
+            span.innerText =
+                skill;
+
+            container.appendChild(
+                span
+            );
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   DISPLAY LIST
+================================================== */
+
+function displayList(
+    elementId,
+    items
+) {
+
+    const list =
+        document.getElementById(
+            elementId
+        );
+
+
+    list.innerHTML =
+        "";
+
+
+    if (
+        !Array.isArray(items) ||
+        items.length === 0
+    ) {
+
+        const li =
+            document.createElement(
+                "li"
+            );
+
+        li.innerText =
+            "No information available.";
+
+        list.appendChild(
+            li
+        );
+
+        return;
+    }
+
+
+    items.forEach(
+        function(item) {
+
+            const li =
+                document.createElement(
+                    "li"
+                );
+
+            li.innerText =
+                item;
+
+            list.appendChild(
+                li
+            );
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   JOB ROLE MATCH
+================================================== */
+
+function calculateJobMatch(
+    role,
+    skillsFound
+) {
+
+    const job =
+        role ||
+        "Software Developer";
+
+
+    document.getElementById(
+        "jobRoleName"
+    ).innerText =
+        "Target Role: " + job;
+
+
+    const roleSkills = {
+
+        "software developer": [
+            "python",
+            "java",
+            "javascript",
+            "sql",
+            "git",
+            "data structures"
+        ],
+
+        "web developer": [
+            "html",
+            "css",
+            "javascript",
+            "react",
+            "git",
+            "sql"
+        ],
+
+        "frontend developer": [
+            "html",
+            "css",
+            "javascript",
+            "react",
+            "git"
+        ],
+
+        "backend developer": [
+            "python",
+            "java",
+            "sql",
+            "git",
+            "api",
+            "database"
+        ],
+
+        "full stack developer": [
+            "html",
+            "css",
+            "javascript",
+            "react",
+            "python",
+            "sql",
+            "git"
+        ],
+
+        "python developer": [
+            "python",
+            "sql",
+            "git",
+            "api",
+            "data structures"
+        ],
+
+        "ai engineer": [
+            "python",
+            "machine learning",
+            "sql",
+            "git",
+            "data structures"
+        ]
+
+    };
+
+
+    const requiredSkills =
+        roleSkills[
+            job.toLowerCase().trim()
+        ] ||
+        [
+            "python",
+            "java",
+            "javascript",
+            "html",
+            "css",
+            "sql",
+            "git"
+        ];
+
+
+    const userSkills =
+        (skillsFound || [])
+            .map(
+                function(skill) {
+
+                    return String(skill)
+                        .toLowerCase()
+                        .trim();
+
+                }
+            );
+
+
+    const matching =
+        requiredSkills.filter(
+            function(skill) {
+
+                return userSkills.includes(
+                    skill
+                );
+
+            }
+        );
+
+
+    const missing =
+        requiredSkills.filter(
+            function(skill) {
+
+                return !userSkills.includes(
+                    skill
+                );
+
+            }
+        );
+
+
+    const percentage =
+        Math.round(
+            matching.length /
+            requiredSkills.length *
+            100
+        );
+
+
+    document.getElementById(
+        "matchScore"
+    ).innerText =
+        percentage + "%";
+
+
+    displaySkills(
+        "matchingSkills",
+        matching,
+        "skill"
+    );
+
+
+    displaySkills(
+        "skillsToLearn",
+        missing,
+        "suggested-skill"
+    );
+
+}
+
+
+/* ==================================================
+   CAMERA
+================================================== */
+
+async function startCamera() {
+
+    const video =
+        document.getElementById(
+            "cameraVideo"
+        );
+
+    const status =
+        document.getElementById(
+            "cameraStatus"
+        );
+
+
+    if (cameraStream) {
+
+        return;
+
+    }
+
+
+    try {
+
+        cameraStream =
+            await navigator.mediaDevices
+                .getUserMedia({
+
+                    video: true,
+
+                    audio: true
+
+                });
+
+
+        video.srcObject =
+            cameraStream;
+
+
+        status.innerText =
+            "🎥 Camera and microphone are active.";
+
+
+        status.style.background =
+            "#e6f4ea";
+
+
+        status.style.color =
+            "#137333";
+
+
+        try {
+
+            await video.play();
+
+        } catch (error) {
+
+            console.log(
+                "Video play:",
+                error
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+
+        status.innerText =
+            "❌ Camera/microphone permission denied. Please allow access in Chrome.";
+
+
+        status.style.background =
+            "#fdecea";
+
+
+        status.style.color =
+            "#b42318";
+
+    }
+
+}
+
+
+/* ==================================================
+   STOP CAMERA
+================================================== */
+
+function stopCamera() {
+
+    const video =
+        document.getElementById(
+            "cameraVideo"
+        );
+
+
+    if (cameraStream) {
+
+        cameraStream
+            .getTracks()
+            .forEach(
+                function(track) {
+
+                    track.stop();
+
+                }
+            );
+
+        cameraStream =
+            null;
+
+    }
+
+
+    video.srcObject =
+        null;
+
+
+    const status =
+        document.getElementById(
+            "cameraStatus"
+        );
+
+
+    status.innerText =
+        "📷 Camera is stopped.";
+
+
+    status.style.background =
+        "#eef4ff";
+
+
+    status.style.color =
+        "#222";
+
+}
+/* ==================================================
+   AI SPEAKING
+================================================== */
+
+function speakAI(text, callback) {
+
+    if (!text) {
+
+        if (callback) {
+            callback();
+        }
+
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const utterance =
+        new SpeechSynthesisUtterance(text);
+
+    utterance.lang = "en-US";
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    setStatus(
+        "🤖 AI is speaking..."
+    );
+
+    utterance.onstart =
+        function() {
+
+            isListening = false;
+
+        };
+
+    utterance.onend =
+        function() {
+
+            if (callback) {
+
+                setTimeout(
+                    callback,
+                    600
+                );
+
+            }
+
+        };
+
+    utterance.onerror =
+        function(error) {
+
+            console.log(
+                "Speech error:",
+                error
+            );
+
+            if (callback) {
+
+                setTimeout(
+                    callback,
+                    600
+                );
+
+            }
+
+        };
+
+    window.speechSynthesis.speak(
+        utterance
+    );
+}
+
+
+/* ==================================================
+   STATUS
+================================================== */
+
+function setStatus(message) {
+
+    const status =
+        document.getElementById(
+            "aiStatus"
+        );
+
+    if (status) {
+
+        status.innerText =
+            message;
+
+    }
+}
+
+
+/* ==================================================
+   ADD AI MESSAGE
+================================================== */
+
+function addAIMessage(message) {
+
+    const conversation =
+        document.getElementById(
+            "conversation"
+        );
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "message ai-message";
+
+    const title =
+        document.createElement(
+            "div"
+        );
+
+    title.className =
+        "message-title";
+
+    title.innerText =
+        "🤖 AI Interviewer";
+
+    const content =
+        document.createElement(
+            "div"
+        );
+
+    content.innerText =
+        message;
+
+    div.appendChild(title);
+
+    div.appendChild(content);
+
+    conversation.appendChild(div);
+
+    conversation.scrollTop =
+        conversation.scrollHeight;
+}
+
+
+/* ==================================================
+   ADD USER MESSAGE
+================================================== */
+
+function addUserMessage(message) {
+
+    const conversation =
+        document.getElementById(
+            "conversation"
+        );
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.className =
+        "message user-message";
+
+    const title =
+        document.createElement(
+            "div"
+        );
+
+    title.className =
+        "message-title";
+
+    title.innerText =
+        "👤 You";
+
+    const content =
+        document.createElement(
+            "div"
+        );
+
+    content.innerText =
+        message;
+
+    div.appendChild(title);
+
+    div.appendChild(content);
+
+    conversation.appendChild(div);
+
+    conversation.scrollTop =
+        conversation.scrollHeight;
+}
+
+
+/* ==================================================
+   SPEECH RECOGNITION
+================================================== */
+
+function setupRecognition() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+
+        alert(
+            "Speech recognition is not supported. Please use Google Chrome."
+        );
+
+        return false;
+    }
+
+    recognition =
+        new SpeechRecognition();
+
+    recognition.lang =
+        "en-US";
+
+    /*
+     * Continuous listening allows the user
+     * to give a long answer.
+     */
+
+    recognition.continuous =
+        true;
+
+    recognition.interimResults =
+        true;
+
+    recognition.maxAlternatives =
+        1;
+
+
+    recognition.onstart =
+        function() {
+
+            isListening =
+                true;
+
+            setStatus(
+                "🎤 Listening... Speak your complete answer."
+            );
+
+            document.getElementById(
+                "transcript"
+            ).innerText =
+                "🎤 Listening...";
+
+        };
+
+
+    recognition.onresult =
+        function(event) {
+
+            let finalText =
+                "";
+
+            let interimText =
+                "";
+
+
+            for (
+                let i = event.resultIndex;
+                i < event.results.length;
+                i++
+            ) {
+
+                const result =
+                    event.results[i];
+
+                const text =
+                    result[0].transcript;
+
+
+                if (
+                    result.isFinal
+                ) {
+
+                    finalText +=
+                        text + " ";
+
+                } else {
+
+                    interimText +=
+                        text;
+
+                }
+
+            }
+
+
+            /*
+             * Add final speech to
+             * the complete answer.
+             */
+
+            if (
+                finalText.trim()
+            ) {
+
+                answerBuffer +=
+                    finalText;
+
+            }
+
+
+            const display =
+                (
+                    answerBuffer +
+                    interimText
+                ).trim();
+
+
+            if (display) {
+
+                document.getElementById(
+                    "transcript"
+                ).innerText =
+                    "🎤 " + display;
+
+            }
+
+
+            resetSilenceTimer();
+
+        };
+
+
+    recognition.onerror =
+        function(event) {
+
+            console.log(
+                "Speech recognition error:",
+                event.error
+            );
+
+            isListening =
+                false;
+
+
+            if (
+                event.error ===
+                "not-allowed"
+            ) {
+
+                setStatus(
+                    "❌ Microphone permission denied. Allow microphone access in Chrome."
+                );
+
+                return;
+            }
+
+
+            if (
+                event.error ===
+                "audio-capture"
+            ) {
+
+                setStatus(
+                    "❌ Microphone could not be accessed."
+                );
+
+                return;
+            }
+
+
+            if (
+                event.error ===
+                "no-speech"
+            ) {
+
+                setStatus(
+                    "🎤 I didn't hear you. Please continue."
+                );
+
+                return;
+            }
+
+        };
+
+
+    recognition.onend =
+        function() {
+
+            isListening =
+                false;
+
+
+            if (
+                processingAnswer
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                interviewRunning &&
+                answerBuffer.trim()
+            ) {
+
+                submitCompleteAnswer();
+
+            }
+
+        };
+
+
+    return true;
+}
+
+
+/* ==================================================
+   SILENCE TIMER
+================================================== */
+
+function resetSilenceTimer() {
+
+    if (silenceTimer) {
+
+        clearTimeout(
+            silenceTimer
+        );
+
+    }
+
+
+    /*
+     * Wait 3 seconds after the user stops speaking.
+     */
+
+    silenceTimer =
+        setTimeout(
+            function() {
+
+                if (
+                    interviewRunning &&
+                    !processingAnswer &&
+                    answerBuffer.trim()
+                ) {
+
+                    submitCompleteAnswer();
+
+                }
+
+            },
+            3000
+        );
+}
+
+
+/* ==================================================
+   START LISTENING
+================================================== */
+
+function startListening() {
+
+    if (!interviewRunning) {
+
+        return;
+
+    }
+
+
+    if (!recognition) {
+
+        const ready =
+            setupRecognition();
+
+        if (!ready) {
+
+            return;
+
+        }
+
+    }
+
+
+    if (isListening) {
+
+        return;
+
+    }
+
+
+    /*
+     * Start a fresh answer.
+     */
+
+    answerBuffer =
+        "";
+
+    processingAnswer =
+        false;
+
+
+    if (silenceTimer) {
+
+        clearTimeout(
+            silenceTimer
+        );
+
+        silenceTimer =
+            null;
+
+    }
+
+
+    document.getElementById(
+        "transcript"
+    ).innerText =
+        "🎤 Listening... Speak your complete answer.";
+
+
+    try {
+
+        recognition.start();
+
+    } catch (error) {
+
+        console.log(
+            "Recognition start:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   SUBMIT COMPLETE ANSWER
+================================================== */
+
+async function submitCompleteAnswer() {
+
+    if (
+        !interviewRunning ||
+        processingAnswer
+    ) {
+
+        return;
+
+    }
+
+
+    const answer =
+        answerBuffer.trim();
+
+
+    if (!answer) {
+
+        return;
+
+    }
+
+
+    processingAnswer =
+        true;
+
+    isListening =
+        false;
+
+
+    if (silenceTimer) {
+
+        clearTimeout(
+            silenceTimer
+        );
+
+        silenceTimer =
+            null;
+
+    }
+
+
+    if (recognition) {
+
+        try {
+
+            recognition.stop();
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+
+    /*
+     * Display the complete answer.
+     */
+
+    addUserMessage(
+        answer
+    );
+
+
+    document.getElementById(
+        "transcript"
+    ).innerText =
+        "⏳ Processing your complete answer...";
+
+
+    setStatus(
+        "🤖 AI is thinking..."
+    );
+
+
+    answerBuffer =
+        "";
+
+
+    const response =
+        await getAIResponse(
+            answer
+        );
+
+
+    if (!interviewRunning) {
+
+        return;
+
+    }
+
+
+    processingAnswer =
+        false;
+
+
+    addAIMessage(
+        response
+    );
+
+
+    /*
+     * AI speaks automatically,
+     * then microphone starts again.
+     */
+
+    speakAI(
+        response,
+        function() {
+
+            if (
+                interviewRunning
+            ) {
+
+                setTimeout(
+                    function() {
+
+                        startListening();
+
+                    },
+                    500
+                );
+
+            }
+
+        }
+    );
+
+}
+/* ==================================================
+   AI RESPONSE
+================================================== */
+
+async function getAIResponse(answer) {
+
+    /*
+     * Try the real FastAPI AI endpoint.
+     */
+
+    try {
+
+        const response =
+            await fetch(
+                API_BASE +
+                "/interview/respond",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        role:
+                            jobRole,
+
+                        experience:
+                            experience,
+
+                        question:
+                            currentQuestion,
+
+                        answer:
+                            answer,
+
+                        question_index:
+                            currentQuestionIndex
+
+                    })
+                }
+            );
+
+
+        if (response.ok) {
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "AI response:",
+                data
+            );
+
+
+            if (
+                data.next_question
+            ) {
+
+                currentQuestion =
+                    data.next_question;
+
+                currentQuestionIndex++;
+
+                return (
+                    data.response ||
+                    data.message ||
+                    data.reply ||
+                    data.next_question
+                );
+
+            }
+
+
+            return (
+                data.response ||
+                data.message ||
+                data.reply ||
+                getNextQuestion()
+            );
+
+        }
+
+    } catch (error) {
+
+        console.log(
+            "AI endpoint error:",
+            error
+        );
+
+    }
+
+
+    /*
+     * If /respond is unavailable,
+     * continue through the questions.
+     */
+
+    return getNextQuestion();
+
+}
+
+
+/* ==================================================
+   NEXT QUESTION
+================================================== */
+
+function getNextQuestion() {
+
+    const nextIndex =
+        currentQuestionIndex + 1;
+
+
+    if (
+        nextIndex <
+        interviewQuestions.length
+    ) {
+
+        currentQuestionIndex =
+            nextIndex;
+
+
+        currentQuestion =
+            interviewQuestions[
+                currentQuestionIndex
+            ];
+
+
+        return (
+            "Thank you for your answer. " +
+            currentQuestion
+        );
+
+    }
+
+
+    interviewRunning =
+        false;
+
+
+    return (
+        "Thank you for completing the mock interview. " +
+        "You have successfully completed all the questions."
+    );
+
+}
+
+
+/* ==================================================
+   START INTERVIEW
+================================================== */
+
+async function startInterview() {
+
+    if (interviewRunning) {
+
+        return;
+
+    }
+
+
+    /*
+     * Get current values.
+     * Nothing is stored in localStorage.
+     */
+
+    jobRole =
+        document.getElementById(
+            "role"
+        ).value.trim();
+
+
+    experience =
+        document.getElementById(
+            "experience"
+        ).value;
+
+
+    const error =
+        document.getElementById(
+            "interviewError"
+        );
+
+
+    error.style.display =
+        "none";
+
+
+    if (!jobRole) {
+
+        error.innerText =
+            "Please enter a job role.";
+
+        error.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    if (!experience) {
+
+        error.innerText =
+            "Please select your experience.";
+
+        error.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    interviewRunning =
+        true;
+
+    processingAnswer =
+        false;
+
+    answerBuffer =
+        "";
+
+    currentQuestionIndex =
+        0;
+
+    interviewQuestions =
+        [];
+
+
+    document.getElementById(
+        "conversation"
+    ).innerHTML =
+        "";
+
+
+    document.getElementById(
+        "aiInterview"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "interviewLoading"
+    ).style.display =
+        "block";
+
+
+    setStatus(
+        "🤖 Preparing your AI interview..."
+    );
+
+
+    /*
+     * Start camera automatically.
+     */
+
+    await startCamera();
+
+
+    /*
+     * Prepare microphone.
+     */
+
+    const recognitionReady =
+        setupRecognition();
+
+
+    if (!recognitionReady) {
+
+        interviewRunning =
+            false;
+
+        return;
+
+    }
+
+
+    /*
+     * Ask backend for interview questions.
+     */
+
+    try {
+
+        const response =
+            await fetch(
+                API_BASE +
+                "/interview/start",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        role:
+                            jobRole,
+
+                        experience:
+                            experience
+
+                    })
+                }
+            );
+
+
+        if (response.ok) {
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Interview start:",
+                data
+            );
+
+
+            if (
+                Array.isArray(
+                    data.questions
+                )
+            ) {
+
+                interviewQuestions =
+                    data.questions;
+
+            }
+
+
+            if (
+                data.question
+            ) {
+
+                interviewQuestions = [
+                    data.question
+                ];
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Interview backend error:",
+            error
+        );
+
+    }
+
+
+    /*
+     * Fallback questions.
+     *
+     * This prevents the same question from
+     * being asked repeatedly if the backend
+     * doesn't return a question list.
+     */
+
+    if (
+        interviewQuestions.length === 0
+    ) {
+
+        interviewQuestions = [
+
+            "Hello! Welcome to your mock interview. Please tell me about yourself.",
+
+            "What are your main technical skills?",
+
+            "Can you explain one of your projects in detail?",
+
+            "What was the biggest challenge you faced in that project?",
+
+            "How did you solve that challenge?",
+
+            "How do you find and fix bugs in your code?",
+
+            "Why are you interested in this job role?",
+
+            "What are your strengths as a developer?",
+
+            "What are you currently learning?",
+
+            "Where do you see yourself in the next five years?"
+
+        ];
+
+    }
+
+
+    currentQuestionIndex =
+        0;
+
+
+    currentQuestion =
+        interviewQuestions[0];
+
+
+    document.getElementById(
+        "interviewLoading"
+    ).style.display =
+        "none";
+
+
+    /*
+     * Display first question.
+     */
+
+    addAIMessage(
+        currentQuestion
+    );
+
+
+    /*
+     * AI speaks.
+     * When it finishes, microphone starts.
+     */
+
+    speakAI(
+        currentQuestion,
+        function() {
+
+            if (
+                interviewRunning
+            ) {
+
+                startListening();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   STOP INTERVIEW
+================================================== */
+
+function stopInterview() {
+
+    interviewRunning =
+        false;
+
+
+    processingAnswer =
+        false;
+
+
+    isListening =
+        false;
+
+
+    if (silenceTimer) {
+
+        clearTimeout(
+            silenceTimer
+        );
+
+        silenceTimer =
+            null;
+
+    }
+
+
+    if (recognition) {
+
+        try {
+
+            recognition.stop();
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+
+    window.speechSynthesis.cancel();
+
+
+    stopCamera();
+
+
+    setStatus(
+        "⏹ Interview stopped."
+    );
+
+
+    document.getElementById(
+        "transcript"
+    ).innerText =
+        "Interview stopped.";
+
+}
+
+
+/* ==================================================
+   PAGE CLEANUP
+================================================== */
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        interviewRunning =
+            false;
+
+
+        if (silenceTimer) {
+
+            clearTimeout(
+                silenceTimer
+            );
+
+        }
+
+
+        if (recognition) {
+
+            try {
+
+                recognition.stop();
+
+            } catch (error) {
+
+                console.log(error);
+
+            }
+
+        }
+
+
+        window.speechSynthesis.cancel();
+
+
+        if (cameraStream) {
+
+            cameraStream
+                .getTracks()
+                .forEach(
+                    function(track) {
+
+                        track.stop();
+
+                    }
+                );
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   INITIAL PAGE STATE
+================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        /*
+         * Do NOT use localStorage.
+         * These fields will be empty after refresh.
+         */
+
+        document.getElementById(
+            "role"
+        ).value =
+            "";
+
+
+        document.getElementById(
+            "experience"
+        ).value =
+            "";
+
+
+        document.getElementById(
+            "jobRole"
+        ).value =
+            "";
+
+
+        document.getElementById(
+            "resumeResult"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "aiInterview"
+        ).style.display =
+            "none";
+
+
+        setStatus(
+            "🤖 Select a job role and experience, then start your interview."
+        );
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
